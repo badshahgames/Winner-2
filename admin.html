@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Color Trado</title>
+    <link href="css/admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="admin-profile">
+                <img id="adminAvatar" src="images/admin-icon.png" alt="Admin">
+                <h3>Admin Panel</h3>
+            </div>
+            <nav>
+                <a href="#" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#" data-section="users"><i class="fas fa-users"></i> Users</a>
+                <a href="#" data-section="deposits"><i class="fas fa-money-bill-wave"></i> Deposits</a>
+                <a href="#" data-section="withdrawals"><i class="fas fa-wallet"></i> Withdrawals</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            <section id="dashboardSection" class="content-section active">
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeToday">0</div>
+                        <div class="stat-label">Active Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDeposits">₹0</div>
+                        <div class="stat-label">Total Deposits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalWithdrawals">₹0</div>
+                        <div class="stat-label">Total Withdrawals</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="usersSection" class="content-section">
+                <h2>User Management</h2>
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Balance</th>
+                                <th>Wins/Losses</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="depositsSection" class="content-section">
+                <h2>Deposit Requests</h2>
+                <div class="table-container">
+                    <table id="depositsTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>UPI ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="withdrawalsSection" class="content-section">
+                <h2>Withdrawal Requests</h2>
+                <div class="filter-controls">
+                    <select id="withdrawalFilter">
+                        <option value="all">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table id="withdrawalsTable">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>UPI ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
