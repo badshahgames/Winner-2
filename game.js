@@ -1,28 +1,38 @@
-// Initialize game variables
-let gameState = 'waiting'; // waiting, betting, result
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from './auth.js';
+import { collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
+
+// Game variables
+let gameState = 'waiting'; // waiting, betting, results
 let countdown = 30;
 let timerInterval;
+let currentUser = null;
+let userData = { balance: 0, wins: 0, losses: 0 };
 let bets = { red: 0, green: 0, violet: 0 };
-let currentRound = {};
-let userBalance = 0;
+let gameHistory = [];
 
 // DOM elements
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const userBalance = document.getElementById('userBalance');
 const gameTimer = document.getElementById('gameTimer');
 const colorWheel = document.getElementById('colorWheel');
 const placeBetBtn = document.getElementById('placeBetBtn');
 const cashOutBtn = document.getElementById('cashOutBtn');
 const betButtons = document.querySelectorAll('.bet-btn');
+const historyGrid = document.getElementById('historyGrid');
+const adminLink = document.getElementById('adminLink');
 
 // Initialize game
 function initGame() {
-    buildColorWheel();
     setupEventListeners();
-    startGameLoop();
+    buildColorWheel();
     checkAuthState();
+    loadGameHistory();
+    startGameLoop();
 }
 
 function buildColorWheel() {
-    // Create wheel segments
     const segments = [
         { color: 'red', degrees: 0 },
         { color: 'green', degrees: 120 },
@@ -38,7 +48,6 @@ function buildColorWheel() {
 }
 
 function setupEventListeners() {
-    // Bet buttons
     betButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.getAttribute('data-color');
@@ -48,11 +57,61 @@ function setupEventListeners() {
         });
     });
     
-    // Place bet button
     placeBetBtn.addEventListener('click', placeBet);
-    
-    // Cash out button
     cashOutBtn.addEventListener('click', cashOut);
+}
+
+function checkAuthState() {
+    onAuthStateChanged((user) => {
+        if (user) {
+            currentUser = user;
+            userAvatar.src = user.photoURL || 'images/default-avatar.png';
+            userName.textContent = user.displayName || 'User';
+            loadUserData(user.uid);
+            
+            // Check if user is admin
+            checkAdminStatus(user.uid);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+}
+
+async function checkAdminStatus(uid) {
+    const docRef = doc(db, "admins", uid);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+        adminLink.style.display = 'block';
+    } else {
+        adminLink.style.display = 'none';
+    }
+}
+
+async function loadUserData(uid) {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+        userData = docSnap.data();
+        updateBalance();
+    } else {
+        // New user - give bonus
+        userData = { balance: 10, wins: 0, losses: 0 };
+        await setDoc(docRef, userData);
+        updateBalance();
+    }
+}
+
+function loadGameHistory() {
+    const historyRef = collection(db, "gameHistory");
+    onSnapshot(historyRef, (snapshot) => {
+        gameHistory = [];
+        snapshot.forEach((doc) => {
+            gameHistory.push(doc.data());
+        });
+        renderHistory();
+    });
 }
 
 function startGameLoop() {
@@ -69,10 +128,10 @@ function updateGame() {
                 startBettingPhase();
                 break;
             case 'betting':
-                startRound();
+                startResultPhase();
                 break;
-            case 'result':
-                resetRound();
+            case 'results':
+                startNewRound();
                 break;
         }
     }
@@ -80,13 +139,13 @@ function updateGame() {
 
 function startBettingPhase() {
     gameState = 'betting';
-    countdown = 10;
+    countdown = 30;
     resetBets();
     updateUI();
 }
 
 function addBet(color) {
-    if (userBalance < 10) {
+    if (userData.balance < 10) {
         alert('Insufficient balance!');
         return;
     }
@@ -102,21 +161,21 @@ function placeBet() {
         return;
     }
     
-    if (userBalance < totalBet) {
+    if (userData.balance < totalBet) {
         alert('Insufficient balance!');
         return;
     }
     
     // Deduct from balance
-    userBalance -= totalBet;
-    updateUserBalance();
+    userData.balance -= totalBet;
+    updateUserData();
     
     // Disable betting
     gameState = 'processing';
     placeBetBtn.disabled = true;
 }
 
-function startRound() {
+function startResultPhase() {
     gameState = 'processing';
     
     // Determine result with 35% win probability
@@ -127,16 +186,17 @@ function startRound() {
         colors.find(color => bets[color] === 0) || colors[Math.floor(Math.random() * 3)];
     
     // Calculate win amount
-    let multiplier = 2;
-    if (resultColor === 'violet') multiplier = 4;
+    let multiplier = resultColor === 'violet' ? 4 : 2;
     const winAmount = isWin ? bets[resultColor] * multiplier : 0;
+    
+    // Save game result
+    saveGameResult(resultColor, winAmount);
     
     // Spin animation
     spinWheel(resultColor, winAmount);
 }
 
 function spinWheel(resultColor, winAmount) {
-    // Calculate spin degrees (3 full rotations + segment position)
     const segmentDegrees = {
         red: 0,
         green: 120,
@@ -147,26 +207,28 @@ function spinWheel(resultColor, winAmount) {
     colorWheel.style.transition = 'transform 3s ease-out';
     colorWheel.style.transform = `rotate(${spinDegrees}deg)`;
     
-    // Show result after spin completes
     setTimeout(() => {
         showResult(resultColor, winAmount);
     }, 3500);
 }
 
 function showResult(resultColor, winAmount) {
-    gameState = 'result';
+    gameState = 'results';
     countdown = 5;
     
     if (winAmount > 0) {
-        userBalance += winAmount;
-        updateUserBalance();
-        showWinNotification(winAmount, resultColor);
+        userData.balance += winAmount;
+        userData.wins += 1;
+        updateUserData();
+        showNotification(`You won ₹${winAmount}!`, 'success');
     } else {
-        showLossNotification(resultColor);
+        userData.losses += 1;
+        updateUserData();
+        showNotification('Better luck next time!', 'error');
     }
 }
 
-function resetRound() {
+function startNewRound() {
     gameState = 'waiting';
     countdown = 30;
     resetBets();
@@ -180,5 +242,68 @@ function resetRound() {
     }, 10);
 }
 
-// Initialize when DOM is loaded
+function updateUI() {
+    document.getElementById('redAmount').textContent = bets.red;
+    document.getElementById('greenAmount').textContent = bets.green;
+    document.getElementById('violetAmount').textContent = bets.violet;
+    
+    const total = bets.red + bets.green + bets.violet;
+    document.getElementById('totalBet').textContent = total;
+}
+
+function updateBalance() {
+    userBalance.textContent = `₹${userData.balance}`;
+}
+
+async function updateUserData() {
+    if (!currentUser) return;
+    
+    await updateDoc(doc(db, "users", currentUser.uid), {
+        balance: userData.balance,
+        wins: userData.wins,
+        losses: userData.losses,
+        lastPlayed: new Date()
+    });
+    
+    updateBalance();
+}
+
+async function saveGameResult(color, winAmount) {
+    if (!currentUser) return;
+    
+    const resultData = {
+        color,
+        winAmount,
+        timestamp: new Date(),
+        userId: currentUser.uid,
+        bets: { ...bets }
+    };
+    
+    await addDoc(collection(db, "gameHistory"), resultData);
+}
+
+function renderHistory() {
+    historyGrid.innerHTML = '';
+    const recentHistory = gameHistory.slice(-10).reverse();
+    
+    recentHistory.forEach(result => {
+        const item = document.createElement('div');
+        item.className = `history-item ${result.color}`;
+        item.textContent = result.color.charAt(0).toUpperCase();
+        historyGrid.appendChild(item);
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Initialize game
 document.addEventListener('DOMContentLoaded', initGame);
