@@ -3,107 +3,1091 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Login with Firebase</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Color Trado - Predict & Win</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --red: #ff7675;
+            --green: #55efc4;
+            --violet: #a55eea;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --white: #ffffff;
+            --shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
         body {
-            font-family: 'Roboto', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        /* Auth Screen */
+        .auth-screen {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             text-align: center;
-            width: 350px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
         }
         
-        h1 {
-            color: #202124;
+        .auth-container {
+            max-width: 350px;
+            width: 100%;
+        }
+        
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        
+        .auth-screen h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .auth-screen p {
             margin-bottom: 30px;
-            font-size: 24px;
+            opacity: 0.9;
         }
         
         .google-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: white;
-            color: #3c4043;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            padding: 10px 24px;
-            font-size: 14px;
+            background: var(--white);
+            color: var(--dark);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
             width: 100%;
             margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
         
         .google-btn:hover {
-            background: #f7f8f8;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
         
         .google-icon {
             margin-right: 12px;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .bonus-note {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 50px;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        /* Game Screen */
+        .game-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
         }
         
         .user-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            display: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .user-avatar {
-            width: 80px;
-            height: 80px;
+        .user-info img {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--white);
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-details span:first-child {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .user-details span:last-child {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar.open {
+            right: 0;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            position: relative;
+        }
+        
+        .sidebar-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--white);
             margin-bottom: 10px;
         }
         
-        .logout-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            cursor: pointer;
-            margin-top: 15px;
+        .sidebar-header h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
         }
         
-        .logout-btn:hover {
-            background: #c82333;
+        .sidebar-header span {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .sidebar nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .sidebar nav ul {
+            list-style: none;
+        }
+        
+        .sidebar nav ul li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+        }
+        
+        .sidebar nav ul li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Game Area */
+        .game-main {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        
+        .game-area {
+            padding: 20px;
+        }
+        
+        .timer-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .timer {
+            font-size: 50px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timer-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .color-wheel {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 30px;
+            position: relative;
+            border-radius: 50%;
+            background: #f1f1f1;
+            box-shadow: var(--shadow);
+            transform: rotate(0deg);
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        .wheel-center {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: var(--white);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .wheel-segment {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%);
+            border-radius: 50%;
+            transform-origin: center;
+        }
+        
+        .wheel-segment.red {
+            background: var(--red);
+            transform: rotate(0deg);
+        }
+        
+        .wheel-segment.green {
+            background: var(--green);
+            transform: rotate(120deg);
+        }
+        
+        .wheel-segment.violet {
+            background: var(--violet);
+            transform: rotate(240deg);
+        }
+        
+        .bet-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .bet-option {
+            flex: 1;
+            background: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        
+        .bet-option:hover {
+            transform: translateY(-5px);
+        }
+        
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            margin: 0 auto 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .color-box.red {
+            background: var(--red);
+        }
+        
+        .color-box.green {
+            background: var(--green);
+        }
+        
+        .color-box.violet {
+            background: var(--violet);
+        }
+        
+        .multiplier {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .bet-amount {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .add-bet {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .add-bet:hover {
+            background: var(--secondary);
+        }
+        
+        .game-controls {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .bet-btn, .cashout-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+        
+        .bet-btn {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .bet-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .cashout-btn {
+            background: var(--green);
+            color: var(--dark);
+        }
+        
+        .cashout-btn:hover {
+            background: #00b894;
+        }
+        
+        .cashout-btn:disabled {
+            background: #dfe6e9;
+            color: #b2bec3;
+            cursor: not-allowed;
+        }
+        
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 50;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Result Modal */
+        .result-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            max-width: 90%;
+            width: 350px;
+        }
+        
+        .result-modal.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .result-icon.win {
+            color: var(--green);
+        }
+        
+        .result-icon.lose {
+            color: var(--red);
+        }
+        
+        .result-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .result-amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .result-win {
+            color: var(--green);
+        }
+        
+        .result-lose {
+            color: var(--red);
+        }
+        
+        .result-color {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        .close-modal {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: var(--secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 400px) {
+            .bet-options {
+                flex-direction: column;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
+            
+            .color-wheel {
+                width: 200px;
+                height: 200px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Sign in with Google</h1>
-        <button id="googleSignIn" class="google-btn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" alt="Google logo">
-            Sign in with Google
-        </button>
-        
-        <div id="userInfo" class="user-info">
-            <img id="userPhoto" class="user-avatar" src="" alt="User photo">
-            <h2 id="userName"></h2>
-            <p id="userEmail"></p>
-            <button id="logoutBtn" class="logout-btn">Logout</button>
+    <div class="app-container">
+        <!-- Auth Screen -->
+        <div id="authScreen" class="auth-screen">
+            <div class="auth-container">
+                <div class="logo">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" fill="#6c5ce7"/>
+                        <path d="M30,30 L70,30 L70,70 L30,70 Z" fill="#ffffff"/>
+                        <circle cx="35" cy="35" r="10" fill="#ff7675"/>
+                        <circle cx="65" cy="35" r="10" fill="#55efc4"/>
+                        <circle cx="50" cy="65" r="10" fill="#a55eea"/>
+                    </svg>
+                </div>
+                <h1>Color Trado</h1>
+                <p>Predict colors and win real money!</p>
+                <button id="googleSignIn" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" alt="Google">
+                    Sign in with Google
+                </button>
+                <div class="bonus-note">
+                    <i class="fas fa-gift"></i> Get ₹10 bonus on signup!
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen">
+            <header class="game-header">
+                <div class="user-info">
+                    <img id="userAvatar" src="" alt="User">
+                    <div class="user-details">
+                        <span id="userName"></span>
+                        <span id="userBalance">₹0</span>
+                    </div>
+                </div>
+                <button id="menuBtn" class="menu-btn"><i class="fas fa-bars"></i></button>
+            </header>
+
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <img id="sidebarUserAvatar" src="" alt="User">
+                    <h3 id="sidebarUserName"></h3>
+                    <span id="sidebarUserBalance">₹0</span>
+                    <button id="closeSidebar" class="close-btn"><i class="fas fa-times"></i></button>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active" id="playBtn"><i class="fas fa-gamepad"></i> Play Game</a></li>
+                        <li><a href="#" id="depositBtn"><i class="fas fa-rupee-sign"></i> Add Money</a></li>
+                        <li><a href="#" id="withdrawBtn"><i class="fas fa-wallet"></i> Withdraw</a></li>
+                        <li><a href="#" id="historyBtn"><i class="fas fa-history"></i> History</a></li>
+                        <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <main class="game-main">
+                <!-- Game Area -->
+                <div class="game-area" id="gameArea">
+                    <div class="timer-container">
+                        <div class="timer" id="timer">30</div>
+                        <div class="timer-text">Next round starts in</div>
+                    </div>
+                    
+                    <div class="color-wheel" id="colorWheel">
+                        <div class="wheel-center"></div>
+                        <div class="wheel-segment red" data-color="red"></div>
+                        <div class="wheel-segment green" data-color="green"></div>
+                        <div class="wheel-segment violet" data-color="violet"></div>
+                    </div>
+                    
+                    <div class="bet-options">
+                        <div class="bet-option red" data-color="red">
+                            <div class="color-box red"></div>
+                            <div class="multiplier">2x</div>
+                            <div class="bet-amount">₹<span id="redBet">0</span></div>
+                            <button class="add-bet" data-color="red">+10</button>
+                        </div>
+                        
+                        <div class="bet-option green" data-color="green">
+                            <div class="color-box green"></div>
+                            <div class="multiplier">2x</div>
+                            <div class="bet-amount">₹<span id="greenBet">0</span></div>
+                            <button class="add-bet" data-color="green">+10</button>
+                        </div>
+                        
+                        <div class="bet-option violet" data-color="violet">
+                            <div class="color-box violet"></div>
+                            <div class="multiplier">4x</div>
+                            <div class="bet-amount">₹<span id="violetBet">0</span></div>
+                            <button class="add-bet" data-color="violet">+10</button>
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <button id="placeBetBtn" class="bet-btn">Place Bet (₹<span id="totalBet">0</span>)</button>
+                        <button id="cashOutBtn" class="cashout-btn" disabled>Cash Out</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Result Modal -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-icon" id="resultIcon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="result-title" id="resultTitle">You Won!</h2>
+            <div class="result-amount" id="resultAmount">+₹200</div>
+            <p>Color: <span id="resultColorText">Green</span><span class="result-color" id="resultColorBox"></span></p>
+            <button class="close-modal" id="closeModal">Continue</button>
         </div>
     </div>
 
-    <script type="module" src="auth.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBci1YLe6TGuv9NHFRf1ljBnLH-ULj8jWs",
+            authDomain: "color-trado.firebaseapp.com",
+            projectId: "color-trado",
+            storageBucket: "color-trado.appspot.com",
+            messagingSenderId: "960118997572",
+            appId: "1:960118997572:web:4d533860f2daa609b3b211",
+            measurementId: "G-F3QLVXY0NW"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM elements
+        const authScreen = document.getElementById('authScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const googleSignInBtn = document.getElementById('googleSignIn');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const userBalance = document.getElementById('userBalance');
+        const sidebarUserAvatar = document.getElementById('sidebarUserAvatar');
+        const sidebarUserName = document.getElementById('sidebarUserName');
+        const sidebarUserBalance = document.getElementById('sidebarUserBalance');
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const overlay = document.getElementById('overlay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Game elements
+        const timer = document.getElementById('timer');
+        const colorWheel = document.getElementById('colorWheel');
+        const redBet = document.getElementById('redBet');
+        const greenBet = document.getElementById('greenBet');
+        const violetBet = document.getElementById('violetBet');
+        const totalBet = document.getElementById('totalBet');
+        const placeBetBtn = document.getElementById('placeBetBtn');
+        const cashOutBtn = document.getElementById('cashOutBtn');
+        const addBetBtns = document.querySelectorAll('.add-bet');
+        const resultModal = document.getElementById('resultModal');
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultAmount = document.getElementById('resultAmount');
+        const resultColorText = document.getElementById('resultColorText');
+        const resultColorBox = document.getElementById('resultColorBox');
+        const closeModal = document.getElementById('closeModal');
+
+        // Game variables
+        let currentUser = null;
+        let userData = null;
+        let bets = {
+            red: 0,
+            green: 0,
+            violet: 0
+        };
+        let gameState = 'waiting'; // waiting, betting, spinning, results
+        let countdown = 30;
+        let countdownInterval;
+        let spinTimeout;
+        let selectedColor = null;
+        let winAmount = 0;
+
+        // Initialize the game
+        function initGame() {
+            updateBalance();
+            startCountdown();
+            
+            // Add bet buttons
+            addBetBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    addBet(color);
+                });
+            });
+            
+            // Place bet button
+            placeBetBtn.addEventListener('click', placeBet);
+            
+            // Cash out button
+            cashOutBtn.addEventListener('click', cashOut);
+            
+            // Menu button
+            menuBtn.addEventListener('click', openSidebar);
+            closeSidebar.addEventListener('click', closeSidebarFunc);
+            overlay.addEventListener('click', closeSidebarFunc);
+            
+            // Logout button
+            logoutBtn.addEventListener('click', logout);
+            
+            // Close modal button
+            closeModal.addEventListener('click', closeResultModal);
+        }
+
+        // Start the countdown timer
+        function startCountdown() {
+            clearInterval(countdownInterval);
+            countdown = 30;
+            updateTimer();
+            
+            countdownInterval = setInterval(() => {
+                countdown--;
+                updateTimer();
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    if (gameState === 'waiting') {
+                        startBettingPhase();
+                    } else if (gameState === 'betting') {
+                        startSpinning();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimer() {
+            timer.textContent = countdown;
+            
+            if (countdown <= 10 && gameState === 'betting') {
+                timer.style.color = '#ff7675';
+                timer.style.fontSize = '60px';
+            } else {
+                timer.style.color = '#6c5ce7';
+                timer.style.fontSize = '50px';
+            }
+        }
+
+        // Start betting phase
+        function startBettingPhase() {
+            gameState = 'betting';
+            countdown = 10;
+            updateTimer();
+            
+            // Reset bets
+            bets = { red: 0, green: 0, violet: 0 };
+            updateBetDisplay();
+            
+            // Enable betting
+            placeBetBtn.disabled = false;
+            cashOutBtn.disabled = true;
+        }
+
+        // Add bet to a color
+        function addBet(color) {
+            if (gameState !== 'betting') return;
+            if (userData.balance < 10) {
+                alert('Insufficient balance!');
+                return;
+            }
+            
+            bets[color] += 10;
+            updateBetDisplay();
+        }
+
+        // Update bet display
+        function updateBetDisplay() {
+            redBet.textContent = bets.red;
+            greenBet.textContent = bets.green;
+            violetBet.textContent = bets.violet;
+            
+            const total = bets.red + bets.green + bets.violet;
+            totalBet.textContent = total;
+            placeBetBtn.innerHTML = `Place Bet (₹${total})`;
+        }
+
+        // Place bet
+        function placeBet() {
+            const total = bets.red + bets.green + bets.violet;
+            if (total === 0) {
+                alert('Please add at least ₹10 to place a bet!');
+                return;
+            }
+            
+            if (userData.balance < total) {
+                alert('Insufficient balance!');
+                return;
+            }
+            
+            // Deduct from balance
+            userData.balance -= total;
+            updateBalance();
+            
+            // Disable betting
+            placeBetBtn.disabled = true;
+            
+            // Start countdown to spin
+            if (countdown > 3) countdown = 3;
+        }
+
+        // Start spinning the wheel
+        function startSpinning() {
+            gameState = 'spinning';
+            timer.textContent = 'Spinning...';
+            
+            // Determine result (35% win probability)
+            const isWin = Math.random() < 0.35;
+            const colors = ['red', 'green', 'violet'];
+            const weightedColors = [
+                ...Array(40).fill('red'),
+                ...Array(40).fill('green'),
+                ...Array(20).fill('violet')
+            ];
+            selectedColor = weightedColors[Math.floor(Math.random() * weightedColors.length)];
+            
+            // Calculate win amount
+            let multiplier = 2;
+            if (selectedColor === 'violet') multiplier = 4;
+            winAmount = bets[selectedColor] * multiplier;
+            
+            // Spin animation
+            const spinDegrees = 1800 + (selectedColor === 'red' ? 0 : selectedColor === 'green' ? 120 : 240);
+            colorWheel.style.transform = `rotate(${spinDegrees}deg)`;
+            
+            // Show result after spin
+            setTimeout(showResult, 3000);
+        }
+
+        // Show result
+        function showResult() {
+            gameState = 'results';
+            
+            // Update user balance if won
+            if (winAmount > 0) {
+                userData.balance += winAmount;
+                userData.wins += 1;
+                updateUserData();
+                
+                // Show win modal
+                resultIcon.className = 'result-icon win';
+                resultIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                resultTitle.textContent = 'You Won!';
+                resultAmount.textContent = `+₹${winAmount}`;
+                resultAmount.className = 'result-amount result-win';
+            } else {
+                userData.losses += 1;
+                updateUserData();
+                
+                // Show lose modal
+                resultIcon.className = 'result-icon lose';
+                resultIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                resultTitle.textContent = 'You Lost!';
+                resultAmount.textContent = `-₹${bets.red + bets.green + bets.violet}`;
+                resultAmount.className = 'result-amount result-lose';
+            }
+            
+            // Set result color
+            resultColorText.textContent = selectedColor.charAt(0).toUpperCase() + selectedColor.slice(1);
+            resultColorBox.className = 'result-color';
+            resultColorBox.classList.add(selectedColor);
+            
+            // Show modal
+            resultModal.classList.add('active');
+            overlay.classList.add('active');
+            
+            // Start new round after modal is closed
+        }
+
+        // Close result modal
+        function closeResultModal() {
+            resultModal.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Reset wheel and start new round
+            colorWheel.style.transform = 'rotate(0deg)';
+            gameState = 'waiting';
+            startCountdown();
+        }
+
+        // Cash out (not implemented fully in this example)
+        function cashOut() {
+            // This would be implemented for games where you can cash out during the spin
+            alert('Cash out functionality would be implemented here!');
+        }
+
+        // Update user balance display
+        function updateBalance() {
+            if (!userData) return;
+            userBalance.textContent = `₹${userData.balance}`;
+            sidebarUserBalance.textContent = `₹${userData.balance}`;
+        }
+
+        // Open sidebar
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        }
+
+        // Close sidebar
+        function closeSidebarFunc() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut().then(() => {
+                gameScreen.style.display = 'none';
+                authScreen.style.display = 'flex';
+            }).catch(error => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        // Update user data in Firestore
+        function updateUserData() {
+            if (!currentUser) return;
+            
+            db.collection('users').doc(currentUser.uid).set({
+                name: currentUser.displayName,
+                email: currentUser.email,
+                photoURL: currentUser.photoURL,
+                balance: userData.balance,
+                wins: userData.wins,
+                losses: userData.losses,
+                lastLogin: new Date()
+            }, { merge: true }).then(() => {
+                updateBalance();
+            }).catch(error => {
+                console.error('Error updating user data:', error);
+            });
+        }
+
+        // Google Sign-In
+        googleSignInBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            auth.signInWithPopup(provider).then(result => {
+                currentUser = result.user;
+                
+                // Check if user exists in Firestore
+                db.collection('users').doc(currentUser.uid).get().then(doc => {
+                    if (doc.exists) {
+                        userData = doc.data();
+                    } else {
+                        // New user - give bonus
+                        userData = {
+                            balance: 10, // ₹10 bonus
+                            wins: 0,
+                            losses: 0
+                        };
+                    }
+                    
+                    // Update UI
+                    userAvatar.src = currentUser.photoURL;
+                    userName.textContent = currentUser.displayName;
+                    sidebarUserAvatar.src = currentUser.photoURL;
+                    sidebarUserName.textContent = currentUser.displayName;
+                    
+                    updateBalance();
+                    
+                    // Show game screen
+                    authScreen.style.display = 'none';
+                    gameScreen.style.display = 'flex';
+                    
+                    // Initialize game
+                    initGame();
+                    
+                    // Update user data in Firestore
+                    updateUserData();
+                });
+            }).catch(error => {
+                console.error('Login error:', error);
+                alert(error.message);
+            });
+        });
+
+        // Check auth state on load
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                
+                // Get user data
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    if (doc.exists) {
+                        userData = doc.data();
+                    } else {
+                        userData = {
+                            balance: 10,
+                            wins: 0,
+                            losses: 0
+                        };
+                    }
+                    
+                    // Update UI
+                    userAvatar.src = user.photoURL;
+                    userName.textContent = user.displayName;
+                    sidebarUserAvatar.src = user.photoURL;
+                    sidebarUserName.textContent = user.displayName;
+                    
+                    updateBalance();
+                    
+                    // Show game screen
+                    authScreen.style.display = 'none';
+                    gameScreen.style.display = 'flex';
+                    
+                    // Initialize game
+                    initGame();
+                });
+            } else {
+                // User is signed out
+                gameScreen.style.display = 'none';
+                authScreen.style.display = 'flex';
+            }
+        });
+    </script>
 </body>
 </html>
