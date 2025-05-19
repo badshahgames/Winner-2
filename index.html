@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Trado</title>
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <header class="game-header">
+        <div class="user-profile">
+            <img id="userAvatar" src="images/default-avatar.png" alt="User">
+            <div>
+                <span id="userName">Guest</span>
+                <span id="userBalance">₹0</span>
+            </div>
+        </div>
+        <nav>
+            <a href="deposit.html"><i class="fas fa-plus-circle"></i> Deposit</a>
+            <a href="withdraw.html"><i class="fas fa-wallet"></i> Withdraw</a>
+            <a href="history.html"><i class="fas fa-history"></i> History</a>
+        </nav>
+    </header>
+
+    <main class="game-container">
+        <div class="timer-container">
+            <div id="gameTimer">30</div>
+            <span>Next round starts in</span>
+        </div>
+
+        <div class="color-wheel" id="colorWheel">
+            <!-- Wheel segments will be added by JS -->
+        </div>
+
+        <div class="betting-options">
+            <div class="bet-option" data-color="red">
+                <div class="color-box red"></div>
+                <div class="multiplier">2x</div>
+                <div class="bet-amount">₹<span id="redAmount">0</span></div>
+                <button class="bet-btn" data-color="red">+10</button>
+            </div>
+            
+            <div class="bet-option" data-color="green">
+                <div class="color-box green"></div>
+                <div class="multiplier">2x</div>
+                <div class="bet-amount">₹<span id="greenAmount">0</span></div>
+                <button class="bet-btn" data-color="green">+10</button>
+            </div>
+            
+            <div class="bet-option" data-color="violet">
+                <div class="color-box violet"></div>
+                <div class="multiplier">4x</div>
+                <div class="bet-amount">₹<span id="violetAmount">0</span></div>
+                <button class="bet-btn" data-color="violet">+10</button>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button id="placeBetBtn" class="primary-btn">Place Bet (₹<span id="totalBet">0</span>)</button>
+            <button id="cashOutBtn" class="secondary-btn" disabled>Cash Out</button>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
